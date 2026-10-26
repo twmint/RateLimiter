@@ -1,0 +1,15 @@
+# build output
+build/
+*.o
+*.a
+*.so
+*.dSYM/
+
+# editor / OS noise
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# clangd index
+.cache/
