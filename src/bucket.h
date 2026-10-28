@@ -1,9 +1,10 @@
 #ifndef BUCKET_H
 #define BUCKET_H
-#define NS_PER_SEC 1000000000ULL // 1 second in nanoseconds
 
 #include <stdbool.h>
 #include <stdint.h>
+
+#define NS_PER_SEC 1000000000ULL // 1 second in nanoseconds
 
 typedef struct {
     uint64_t capacity_mt;
@@ -17,7 +18,6 @@ typedef enum {
     BUCKET_DENIED,
     BUCKET_INVALID
 } bucket_result_t;
-
 
 bool bucket_init(bucket_t *b, uint64_t capacity, uint64_t refill_rate, uint64_t now_ns);
 bool bucket_allow(bucket_t *b, uint64_t now_ns);
