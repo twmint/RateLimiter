@@ -110,6 +110,25 @@ static void test_init_rejects_bad_input(void) {
     assert(bucket_init(&b, max_capacity, 1, 0));
 }
 
+static void test_multiple_token_per_req(void) {
+    bucket_t b;
+    assert(bucket_init(&b, 6, 2, 0));
+    assert(bucket_allow_n(&b, 6, 0) == BUCKET_ALLOWED);
+    assert(bucket_allow_n(&b, 1, 0) == BUCKET_DENIED);
+    assert(bucket_allow_n(&b, 2, 1 * NS_PER_SEC) == BUCKET_ALLOWED);
+    assert(bucket_allow_n(&b, 0, 1 * NS_PER_SEC) == BUCKET_INVALID);
+    assert(bucket_allow_n(&b, 1, 3 * NS_PER_SEC / 2) == BUCKET_ALLOWED); // 1.5 s
+    assert(bucket_allow_n(&b, 2, 2 * NS_PER_SEC) == BUCKET_DENIED); // a denied request takes nothing
+    assert(bucket_allow_n(&b, 2, 5 * NS_PER_SEC / 2) == BUCKET_ALLOWED); // 2.5 s
+}
+
+static void test_req_token_exceeds_cap(void) {
+    bucket_t b;
+    assert(bucket_init(&b, 6, 2, 0));
+    assert(bucket_allow_n(&b, 7, 0) == BUCKET_INVALID);
+    assert(bucket_allow_n(&b, 6, 0) == BUCKET_ALLOWED);
+}
+
 int main(void) {
     test_burst_then_deny();
     test_frequent_calls_still_refills();
@@ -122,6 +141,9 @@ int main(void) {
     test_backwards_clock();
     test_fast_rate();
     test_init_rejects_bad_input();
+
+    test_multiple_token_per_req();
+    test_req_token_exceeds_cap();
     puts("all tests passed");
     return 0;
 }
